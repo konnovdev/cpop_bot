@@ -1,2 +1,10 @@
 # Project exclude paths
 /venv/
+/.idea/cpopbot.iml
+/.idea/deployment.xml
+/.idea/misc.xml
+/.idea/modules.xml
+/.idea/inspectionProfiles/profiles_settings.xml
+/.idea/sshConfigs.xml
+/.idea/vcs.xml
+/.idea/webServers.xml
