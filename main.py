@@ -14,7 +14,7 @@ def welcome(message):
 
 
 @bot.message_handler(content_types=['text'])
-def lalala(message):
+def echo(message):
     bot.send_message(message.chat.id, message.text)
 
 
