@@ -1,7 +1,6 @@
 import logging
 from aiogram import Bot, Dispatcher, executor, types
 
-logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
 
