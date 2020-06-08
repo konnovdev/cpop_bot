@@ -3,7 +3,7 @@ import logging
 import os
 
 from aiogram import Bot, Dispatcher, executor, types
-from aiogram.types.base import InputFile
+from aiogram.types import ParseMode
 from pytube import YouTube
 
 logger = logging.getLogger(__name__)
@@ -40,4 +40,6 @@ class TextProcessor:
                                     "in size (52428800 bytes)")
             os.remove(new_filename)
         except Exception as e:
-            logger.error(str(e) + ", failed to download: " + message.text)
+            await message.reply("I've tried downloading this video but caught the "
+                                "following error: " + str(e) + ".\n\n<b>Please report it to @konnov</b>",
+                                parse_mode=ParseMode.HTML)
