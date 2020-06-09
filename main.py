@@ -4,6 +4,7 @@ from aiogram.bot import api
 
 import config
 from command_processor import CommandProcessor
+from new_members_processor import NewMembersProcessor
 from text_processor import TextProcessor
 
 logging.basicConfig(level=logging.DEBUG)
@@ -17,6 +18,12 @@ dp = Dispatcher(
 )
 textProcessor = TextProcessor()
 commandProcessor = CommandProcessor()
+newMembersProcessor = NewMembersProcessor()
+
+
+@dp.message_handler(content_types=types.ContentType.NEW_CHAT_MEMBERS)
+async def process_new_member(message: types.Message):
+    await newMembersProcessor.handle(message)
 
 
 @dp.message_handler(content_types=types.ContentType.TEXT)
