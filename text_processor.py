@@ -38,6 +38,7 @@ class TextProcessor:
                                     "audio file has the size of " + str(file_size) + " bytes. " +
                                     "Bots can currently send files of any type of only up to 50 MB " +
                                     "in size (52428800 bytes)")
+            file.close()
             os.remove(new_filename)
         except Exception as e:
             await message.reply("I've tried downloading this video but caught the "
