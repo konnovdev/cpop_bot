@@ -24,7 +24,8 @@ class CommandHandler:
                                  "youtu.be/somevid</code>. This will <b>not</b> "
                                  "download the video. \n\n<i>This bot is open source, "
                                  "the source code is available at</i> "
-                                 "cpop.tw/code", parse_mode=ParseMode.HTML)
+                                 "cpop.tw/code\n\nRegarding any issues with the bot feel free to "
+                                 "contact @konnov", parse_mode=ParseMode.HTML)
 
     async def __handleStart(self, message):
         sticker = open('static/hello_animated_sticker.tgs', 'rb')
