@@ -7,7 +7,7 @@ logger = logging.getLogger(__name__)
 
 class CommandHandler:
     async def handle(self, message: types.Message):
-        if message.text == "/help":
+        if message.text == "/help" or message.text == "/help@cpop_bot":
             await self.__handleHelp(message)
         if message.text == "/start":
             await self.__handleStart(message)
