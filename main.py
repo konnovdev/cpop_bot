@@ -1,11 +1,10 @@
 import logging
 from aiogram import Bot, Dispatcher, executor, types
-from aiogram.bot import api
 
 import config
-from command_processor import CommandProcessor
-from new_members_processor import NewMembersProcessor
-from text_processor import TextProcessor
+from command_handler import CommandHandler
+from new_members_handler import NewMembersHandler
+from text_handler import TextHandler
 
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
@@ -16,14 +15,14 @@ bot = Bot(
 dp = Dispatcher(
     bot=bot,
 )
-textProcessor = TextProcessor()
-commandProcessor = CommandProcessor()
-newMembersProcessor = NewMembersProcessor()
+textHandler = TextHandler()
+commandHandler = CommandHandler()
+newMembersHandler = NewMembersHandler()
 
 
 @dp.message_handler(content_types=types.ContentType.NEW_CHAT_MEMBERS)
 async def process_new_member(message: types.Message):
-    await newMembersProcessor.handle(bot, message)
+    await newMembersHandler.handle(bot, message)
 
 
 @dp.callback_query_handler(lambda callback: True)
@@ -31,17 +30,17 @@ async def process_callback(callback: types.CallbackQuery):
     if callback.message:
         if callback.data == 'captcha_passed':
             await bot.edit_message_text(chat_id=callback.message.chat.id,
-                                  message_id=callback.message.message_id,
-                                  text="Congrats, " + callback.from_user.first_name + ", captcha passed",
-                                  reply_markup=None)
+                                        message_id=callback.message.message_id,
+                                        text="Congrats, " + callback.from_user.first_name + ", captcha passed",
+                                        reply_markup=None)
 
 
 @dp.message_handler(content_types=types.ContentType.TEXT)
 async def process_text_message(message: types.Message):
     if message.is_command():
-        await commandProcessor.handle(message)
+        await commandHandler.handle(message)
     else:
-        await textProcessor.handle(message)
+        await textHandler.handle(message)
 
 
 def main():

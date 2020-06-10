@@ -5,7 +5,7 @@ from aiogram import types, Bot
 logger = logging.getLogger(__name__)
 
 
-class NewMembersProcessor:
+class NewMembersHandler:
     async def handle(self, bot: Bot, message: types.Message):
         if self.__isBotAdmin(bot, message.chat.id):
             await self.__giveCaptcha(message)

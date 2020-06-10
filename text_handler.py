@@ -9,16 +9,16 @@ from pytube import YouTube
 logger = logging.getLogger(__name__)
 
 
-class TextProcessor:
+class TextHandler:
 
     async def handle(self, message: types.Message):
         text = message.text
         if text and ('youtu.be' in text or 'youtube.com' in text):
-            await self.__handle_youtube_download(message)
+            await self.__handleYoutubeDownload(message)
         elif text == 'ping':
             await message.reply('pong', reply=False)
 
-    async def __handle_youtube_download(self, message: types.Message):
+    async def __handleYoutubeDownload(self, message: types.Message):
         try:
             yt = YouTube(message.text)
             stream = yt.streams.filter(only_audio=True).first()
