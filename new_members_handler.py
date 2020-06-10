@@ -1,4 +1,5 @@
 import logging
+from datetime import date
 
 from aiogram import types, Bot
 
@@ -8,19 +9,19 @@ logger = logging.getLogger(__name__)
 
 
 class NewMembersHandler:
+    pendingUsers = dict()
+
     async def handle(self, bot: Bot, message: types.Message):
         if await self.__isBotAdmin(bot, message.chat.id):
             await self.__giveCaptcha(bot, message)
 
     async def __isBotAdmin(self, bot: Bot, chat_id):
-        bot_user: types.User = await bot.get_me()
-        bot_id = bot_user.id
+        bot_id = (await bot.get_me()).id
         bot_chat_member = await bot.get_chat_member(chat_id, bot_id)
         return bot_chat_member.can_restrict_members
 
     async def __giveCaptcha(self, bot: Bot, message: types.Message):
-        bot_user: types.User = await bot.get_me()
-        if message.new_chat_members[0] == bot_user:
+        if len(message.new_chat_members) > 1 or message.new_chat_members[0].is_bot:
             return
 
         await bot.restrict_chat_member(message.chat.id,
@@ -28,9 +29,34 @@ class NewMembersHandler:
                                        can_send_messages=False,
                                        can_send_media_messages=False,
                                        can_send_other_messages=False)
+        markup = self.__makeInlineKeyboard()
+        await message.reply("Welcome, {0.first_name},\nAre you a spam bot or a human?"
+                            .format(message.from_user), reply_markup=markup)
+        self.pendingUsers[message.message_id + 1] = message.from_user.id
+
+    def __makeInlineKeyboard(self):
         markup = types.InlineKeyboardMarkup(resize_keyboard=True)
         item1 = types.InlineKeyboardButton("human", callback_data=CAPTCHA_SUCCESS)
         item2 = types.InlineKeyboardButton("I am clearly a spam bot", callback_data=CAPTCHA_SUCCESS)
         markup.add(item1, item2)
-        await message.reply("Welcome, {0.first_name},\nAre you a spam bot or a human?"
-                            .format(message.from_user), reply_markup=markup)
+        return markup
+
+    async def handleCaptchaCallback(self, bot: Bot, callback: types.CallbackQuery):
+        pending_user_id = self.pendingUsers.get(callback.message.message_id)
+        if pending_user_id != callback.from_user.id:
+            await bot.answer_callback_query(callback.id,
+                                            text="We are waiting for " +
+                                                 (await callback.message.chat.get_member(pending_user_id)).user.first_name +
+                                                 " to click!",
+                                            show_alert=False)
+        else:
+            await bot.edit_message_text(chat_id=callback.message.chat.id,
+                                        message_id=callback.message.message_id,
+                                        text="Congrats, " + callback.from_user.first_name + ", captcha passed",
+                                        reply_markup=None)
+            await bot.restrict_chat_member(callback.message.chat.id,
+                                           callback.from_user.id,
+                                           can_send_messages=True,
+                                           can_send_media_messages=True,
+                                           can_send_other_messages=True)
+            self.pendingUsers.pop(callback.message.message_id)

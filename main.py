@@ -3,9 +3,9 @@ from aiogram import Bot, Dispatcher, executor, types
 
 import config
 from command_handler import CommandHandler
+from constants import CAPTCHA_SUCCESS
 from new_members_handler import NewMembersHandler
 from text_handler import TextHandler
-from callback_handler import CallbackHandler
 
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
@@ -19,7 +19,6 @@ dp = Dispatcher(
 textHandler = TextHandler()
 commandHandler = CommandHandler()
 newMembersHandler = NewMembersHandler()
-callbackHandler = CallbackHandler()
 
 
 @dp.message_handler(content_types=types.ContentType.NEW_CHAT_MEMBERS)
@@ -30,7 +29,8 @@ async def process_new_member(message: types.Message):
 @dp.callback_query_handler(lambda callback: True)
 async def process_callback(callback: types.CallbackQuery):
     if callback.message:
-        await callbackHandler.handle(bot, callback)
+        if callback.data == CAPTCHA_SUCCESS:
+            await newMembersHandler.handleCaptchaCallback(bot, callback)
 
 
 @dp.message_handler(content_types=types.ContentType.TEXT)
