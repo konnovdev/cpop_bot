@@ -22,7 +22,9 @@ class CommandHandler:
                                  "want the video to be downloaded, just make the link "
                                  " follow a command, for example <code>/test "
                                  "youtu.be/somevid</code>. This will <b>not</b> "
-                                 "download the video", parse_mode=ParseMode.HTML)
+                                 "download the video. \n\n<i>This bot is open source, "
+                                 "the source code is available at</i> "
+                                 "cpop.tw/code", parse_mode=ParseMode.HTML)
 
     async def __handleStart(self, message):
         sticker = open('static/hello_animated_sticker.tgs', 'rb')
