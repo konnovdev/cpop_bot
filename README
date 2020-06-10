@@ -1,7 +1,0 @@
-library requirements:
-
-aiohttp
-uvloop(not strictly required)
-ujson
-aiogram
-pytube3

@@ -1,0 +1,4 @@
+aiohttp
+ujson
+aiogram
+pytube3
