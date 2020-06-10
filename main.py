@@ -18,19 +18,19 @@ dp = Dispatcher(
 )
 textHandler = TextHandler()
 commandHandler = CommandHandler()
-newMembersHandler = NewMembersHandler()
+newMembersHandler = NewMembersHandler(bot)
 
 
 @dp.message_handler(content_types=types.ContentType.NEW_CHAT_MEMBERS)
 async def process_new_member(message: types.Message):
-    await newMembersHandler.handle(bot, message)
+    await newMembersHandler.handle(message)
 
 
 @dp.callback_query_handler(lambda callback: True)
 async def process_callback(callback: types.CallbackQuery):
     if callback.message:
         if callback.data == CAPTCHA_SUCCESS:
-            await newMembersHandler.handleCaptchaCallback(bot, callback)
+            await newMembersHandler.handleCaptchaCallback(callback)
 
 
 @dp.message_handler(content_types=types.ContentType.TEXT)
