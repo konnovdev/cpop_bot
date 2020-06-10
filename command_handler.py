@@ -1,5 +1,5 @@
 import logging
-from aiogram import Bot, Dispatcher, executor, types
+from aiogram import types
 
 logger = logging.getLogger(__name__)
 

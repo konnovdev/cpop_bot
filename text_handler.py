@@ -1,8 +1,7 @@
 import io
 import logging
 import os
-
-from aiogram import Bot, Dispatcher, executor, types
+from aiogram import types
 from aiogram.types import ParseMode
 from pytube import YouTube
 
