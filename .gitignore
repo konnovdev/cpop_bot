@@ -8,3 +8,8 @@
 /.idea/sshConfigs.xml
 /.idea/vcs.xml
 /.idea/webServers.xml
+
+__pycache__/
+
+/config.py
+/downloads/

@@ -20,25 +20,20 @@ class TextHandler:
     async def __handleYoutubeDownload(self, message: types.Message):
         try:
             yt = YouTube(message.text)
-            stream = yt.streams.filter(only_audio=True).first()
-            output_filename = stream.download("downloads")
-            base, ext = os.path.splitext(output_filename)
-            new_filename = base + ".mp3"
-            os.rename(output_filename, new_filename)
-            file = open(new_filename, "rb")
+            author = yt.author
+            length = yt.length
+            title = yt.title
+            stream = yt.streams.filter(only_audio=True, file_extension='mp4').order_by('bitrate').desc().first()
+            filesize = stream.filesize
             telegram_audio_limit = 52428800
-            file_size = os.path.getsize(new_filename)
-            if file_size < telegram_audio_limit:
-                await message.reply_audio(io.BytesIO(file.read()),
-                                          performer="unknown",
-                                          title=new_filename.split("downloads/")[1])
+            if (filesize < telegram_audio_limit and length < 600):
+                output_filename = stream.download("downloads")
+                with open(output_filename, "rb") as f:
+                    await message.reply_audio(f, duration=length, performer=author, title=title)
+                os.remove(output_filename)
             else:
-                await message.reply("The linked video has been successfully downloaded, however, its "
-                                    "audio file has the size of " + str(file_size) + " bytes. " +
-                                    "Bots can currently send files of any type of only up to 50 MB " +
-                                    "in size (52428800 bytes)")
-            file.close()
-            os.remove(new_filename)
+                await message.reply("<code>No downloads for 10min+ audio or file size greater than 50M</code>",
+                                    parse_mode=ParseMode.HTML)
         except Exception as e:
             await message.reply("I've tried downloading this video but caught the "
                                 "following error: " + str(e) + ".\n\n<b>Please report it to @konnov</b>",
