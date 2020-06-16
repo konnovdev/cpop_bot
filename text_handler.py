@@ -4,6 +4,7 @@ import os
 from aiogram import types
 from aiogram.types import ParseMode
 from pytube import YouTube
+import config
 
 logger = logging.getLogger(__name__)
 
@@ -18,6 +19,8 @@ class TextHandler:
             await message.reply('pong', reply=False)
 
     async def __handleYoutubeDownload(self, message: types.Message):
+        if not str(message.chat.id) in config.WHITELIST_CHAT_ID:
+            return
         try:
             yt = YouTube(message.text)
             author = yt.author
