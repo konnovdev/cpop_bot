@@ -2,3 +2,4 @@ aiohttp
 ujson
 aiogram
 pytube3
+Pillow

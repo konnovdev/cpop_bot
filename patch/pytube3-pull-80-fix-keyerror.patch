@@ -1,0 +1,16 @@
+pytube3==9.6.4
+https://github.com/get-pytube/pytube3/pull/80.diff
+
+diff --git a/pytube/extract.py b/pytube/extract.py
+index 43fe7f82..4acdbf2a 100644
+--- a/pytube/extract.py
++++ b/pytube/extract.py
+@@ -298,7 +298,7 @@ def apply_descrambler(stream_data: Dict, key: str) -> None:
+             ]
+         except KeyError:
+             cipher_url = [
+-                parse_qs(formats[i]["cipher"]) for i, data in enumerate(formats)
++                parse_qs(formats[i]["signatureCipher"]) for i, data in enumerate(formats) if "signatureCipher" in formats[i]
+             ]
+             stream_data[key] = [
+                 {
