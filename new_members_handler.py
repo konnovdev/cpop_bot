@@ -32,9 +32,9 @@ class NewMembersHandler:
                                             can_send_media_messages=False,
                                             can_send_other_messages=False)
         markup = self.__makeInlineKeyboard()
-        await message.reply("Welcome, {0.first_name},\nAre you a spam bot or a human?"
-                            .format(message.from_user), reply_markup=markup)
-        self.pendingUsers[message.message_id + 1] = message.from_user.id
+        replied_message = await message.reply("Welcome, {0.first_name},\nAre you a spam bot or a human?"
+                                              .format(message.from_user), reply_markup=markup)
+        self.pendingUsers[replied_message.message_id] = message.from_user.id
 
     def __makeInlineKeyboard(self):
         markup = types.InlineKeyboardMarkup(resize_keyboard=True)
