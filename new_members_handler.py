@@ -57,9 +57,8 @@ class NewMembersHandler:
                                              message_id=callback.message.message_id,
                                              text="Congrats, " + callback.from_user.first_name + ", captcha passed",
                                              reply_markup=None)
-            await self.bot.restrict_chat_member(callback.message.chat.id,
-                                                callback.from_user.id,
-                                                can_send_messages=True,
-                                                can_send_media_messages=True,
-                                                can_send_other_messages=True)
+            await self.bot.restrict_chat_member(
+                callback.message.chat.id,
+                callback.from_user.id,
+                types.ChatPermissions(True, True, True, True, True, True, True, True))
             self.pendingUsers.pop(callback.message.message_id)
