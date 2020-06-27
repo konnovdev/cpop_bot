@@ -49,11 +49,11 @@ class TextHandler:
                 os.remove(output_audiofile)
                 os.remove(output_thumbnail)
             else:
-                await message.reply("<code>No downloads for 10min+ audio" +
+                await message.reply("<code>No downloads for 10min+ audio " +
                                     "or file size greater than 50M</code>",
                                     parse_mode=ParseMode.HTML)
         except Exception as e:
-            await message.reply("I've tried downloading this video but" +
+            await message.reply("I've tried downloading this video but " +
                                 "caught the following error: <code>" +
                                 str(e) + "</code>.\n\n" +
                                 "<b>Please report it to @konnov</b>",
