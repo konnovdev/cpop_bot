@@ -15,10 +15,12 @@ class CommandHandler:
             logger.debug("USER TYPED UNKNOWN COMMAND " + message.text)
 
     async def __handleHelp(self, message):
-        await message.reply(text="this bot is going to manage cpop.tw.\n"
+        await message.reply(text="This bot is going to manage cpop.tw.\n"
                                  "For now it converts a youtube video to mp3 "
-                                 "whenever you send a link and makes new members "
-                                 "go through captcha.\n\n<b>Notice</b> if you don't "
+                                 "whenever you send the link and makes new members "
+                                 "go through captcha.\n\n<b>Notice:</b> the youtube "
+                                 "video feature is <b>only</b> available for the chats "
+                                 "that are in the bot's whitelist. If you don't "
                                  "want the video to be downloaded, just make the link "
                                  " follow a command, for example <code>/test "
                                  "youtu.be/somevid</code>. This will <b>not</b> "
