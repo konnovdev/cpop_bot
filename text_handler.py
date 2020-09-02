@@ -4,6 +4,7 @@ import os
 from aiogram import types
 from aiogram.types import ParseMode
 from pytube import YouTube
+from pytube import extract
 from urllib.request import urlopen
 from PIL import Image
 import config
@@ -33,6 +34,7 @@ class TextHandler:
                       .filter(only_audio=True, file_extension='mp4')
                       .order_by('bitrate').desc().first())
             filesize = stream.filesize
+            video_url = "youtu.be/" + extract.video_id(message.text)
             telegram_audio_limit = 52428800
 
             if (filesize < telegram_audio_limit and length < 600):
@@ -42,6 +44,7 @@ class TextHandler:
                 with open(output_audiofile, "rb") as audio, \
                      open(output_thumbnail, "rb") as thumb:
                     await message.reply_audio(audio,
+                                              caption=video_url,
                                               duration=length,
                                               performer=author,
                                               title=title,
