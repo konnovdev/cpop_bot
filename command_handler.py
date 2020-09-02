@@ -16,15 +16,14 @@ class CommandHandler:
 
     async def __handleHelp(self, message):
         await message.reply(text="This bot is going to manage cpop.tw.\n"
-                                 "For now it converts a youtube video to mp3 "
+                                 "For now it downloads music from YouTube "
                                  "whenever you send the link and makes new members "
-                                 "go through captcha.\n\n<b>Notice:</b> the youtube "
-                                 "video feature is <b>only</b> available for the chats "
-                                 "that are in the bot's whitelist. If you don't "
-                                 "want the video to be downloaded, just make the link "
-                                 " follow a command, for example <code>/test "
-                                 "youtu.be/somevid</code>. This will <b>not</b> "
-                                 "download the video. \n\n<i>This bot is open source, "
+                                 "go through captcha.\n\n<b>Notice:</b> the YouTube "
+                                 "audio feature is <b>only</b> available for "
+                                 "the chats that are in the bot's whitelist. "
+                                 "To download audio from YouTube, you need to send a "
+                                 "message which contains the YouTube link only."
+                                 "\n\n<i>This bot is open source, "
                                  "the source code is available at</i> "
                                  "cpop.tw/code\n\nRegarding any issues with the bot feel free to "
                                  "contact @konnov", parse_mode=ParseMode.HTML)
