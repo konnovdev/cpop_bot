@@ -16,7 +16,7 @@ class TextHandler:
 
     async def handle(self, message: types.Message):
         text = message.text
-        if text and ('youtu.be' in text or 'youtube.com' in text):
+        if text and (' ' not in text and '\n' not in text) and ('youtu.be' in text or 'youtube.com' in text):
             await self.__handleYoutubeDownload(message)
         elif text == 'ping':
             await message.reply('pong', reply=False)
