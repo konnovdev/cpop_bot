@@ -1,4 +1,3 @@
-import io
 import logging
 import os
 from aiogram import types
@@ -40,10 +39,10 @@ class TextHandler:
             telegram_audio_limit = 52428800
 
             if (filesize < telegram_audio_limit and length < 600):
-                output_audiofile = stream.download(output_path = "downloads/",
-                                                   filename = title +
-                                                              " - YouTube - " +
-                                                              video_id)
+                output_audiofile = stream.download(output_path="downloads/",
+                                                   filename=title +
+                                                   " - YouTube - " +
+                                                   video_id)
                 output_thumbnail = "downloads/square_thumbnail_" + video_id + \
                                    ".jpg"
                 self.__make_squarethumb(yt.thumbnail_url, output_thumbnail)
@@ -60,13 +59,13 @@ class TextHandler:
                 os.remove(output_audiofile)
                 os.remove(output_thumbnail)
             else:
-                await message.reply("`No downloads for 10min\+ audio " +
+                await message.reply("`No downloads for 10min\\+ audio " +
                                     "or file size greater than 50M`",
                                     parse_mode=ParseMode.MARKDOWN_V2)
         except Exception as e:
             await message.reply("I've tried downloading this video but " +
                                 "caught the following error: `" +
-                                str(e) + "`\.\n\n" +
+                                str(e) + "`\\.\n\n" +
                                 "*Please report it to @konnov*",
                                 parse_mode=ParseMode.MARKDOWN_V2)
 
@@ -74,7 +73,7 @@ class TextHandler:
     def __make_squarethumb(self, img_url, output):
         original_thumb = Image.open(urlopen(img_url))
         squarethumb = self.__crop_to_square(original_thumb)
-        squarethumb.thumbnail((320,320), Image.ANTIALIAS)
+        squarethumb.thumbnail((320, 320), Image.ANTIALIAS)
         squarethumb.save(output)
 
     def __crop_to_square(self, img):
