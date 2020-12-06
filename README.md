@@ -23,14 +23,6 @@ $ source venv/bin/activate
 $ pip install -r requirements.txt
 ```
 
-Apply patches
-
-```
-$ for patch in patch/*.patch; do patch -d venv/lib/python3.*/site-packages -p1 <$patch; done
-$ ## Or manually apply each patch like this
-$ ## patch -d venv/lib/python3.*/site-packages -p1 <patch/pytube3.patch
-```
-
 Run the bot
 
 `$ python3 main.py`

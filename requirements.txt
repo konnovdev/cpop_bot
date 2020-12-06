@@ -1,5 +1,5 @@
 aiohttp
 ujson
 aiogram
-pytube3
+pytube
 Pillow
