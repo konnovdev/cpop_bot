@@ -1,86 +1,103 @@
-import logging
 import os
-from aiogram import types
+import logging
+import asyncio
+from aiogram import types, Bot
 from aiogram.types import ParseMode
-from pytube import YouTube
-from pytube import extract
-from urllib.request import urlopen
-from PIL import Image
+import music_grabber
 import config
 
+telegram_audio_limit = 52428800
+music_sites = ("youtu.be/", "youtube.com/watch?v=", "soundcloud.com/")
+WHITELIST_CHAT_ID = config.WHITELIST_CHAT_ID
+AVAILABILITY_HTML = config.AVAILABILITY_HTML
+GROUP_CHAT_ID = config.GROUP_CHAT_ID
+DOWNLOAD_DIR = config.DOWNLOAD_DIR
+
 logger = logging.getLogger(__name__)
+musicDownloader = music_grabber.MusicDownloader()
+squarethumbMaker = music_grabber.SquarethumbMaker()
 
 
-# TODO move youtube logic into a separate class
 class TextHandler:
 
+    def __init__(self, bot: Bot):
+        self.bot = bot
+
     async def handle(self, message: types.Message):
+        if not await self.__isProvideService(message):
+            return
         text = message.text
         if text and (' ' not in text and '\n' not in text) \
-                and ('youtu.be' in text or 'youtube.com' in text):
-            await self.__handleYoutubeDownload(message)
+                and any(site in text for site in music_sites):
+            await self.__handleMusicGrabber(message)
         elif text == 'ping':
             await message.reply('pong', reply=False)
 
-    async def __handleYoutubeDownload(self, message: types.Message):
-        if not str(message.chat.id) in config.WHITELIST_CHAT_ID:
-            return
-        try:
-            yt = YouTube(message.text)
-            author = yt.author
-            length = yt.length
-            title = yt.title
-            stream = (yt.streams
-                      .filter(only_audio=True, file_extension='mp4')
-                      .order_by('bitrate').desc().first())
-            filesize = stream.filesize
-            video_id = extract.video_id(message.text)
-            video_url = "youtu.be/" + video_id
-            telegram_audio_limit = 52428800
-
-            if (filesize < telegram_audio_limit and length < 600):
-                output_audiofile = stream.download(output_path="downloads/",
-                                                   filename=title +
-                                                   " - YouTube - " +
-                                                   video_id)
-                output_thumbnail = "downloads/square_thumbnail_" + video_id + \
-                                   ".jpg"
-                self.__make_squarethumb(yt.thumbnail_url, output_thumbnail)
-                with open(output_audiofile, "rb") as audio, \
-                     open(output_thumbnail, "rb") as thumb:
-                    await message.reply_audio(audio,
-                                              caption="<a href=\"" + video_url +
-                                                      "\">" + title + "</a>",
-                                              parse_mode=ParseMode.HTML,
-                                              duration=length,
-                                              performer=author,
-                                              title=title,
-                                              thumb=thumb)
-                os.remove(output_audiofile)
-                os.remove(output_thumbnail)
+    async def __isProvideService(self, message: types.Message):
+        chat_id = message.chat.id
+        if chat_id in WHITELIST_CHAT_ID:
+            return True
+        chat_type = message.chat.type
+        if chat_type == "private":
+            member = await self.bot.get_chat_member(GROUP_CHAT_ID, chat_id)
+            if member.is_chat_member():
+                return True
             else:
-                await message.reply("`No downloads for 10min\\+ audio " +
-                                    "or file size greater than 50M`",
-                                    parse_mode=ParseMode.MARKDOWN_V2)
+                await message.reply(AVAILABILITY_HTML,
+                                    parse_mode=ParseMode.HTML)
+                return False
+        else:
+            return False
+
+    async def __handleMusicGrabber(self, message: types.Message):
+        try:
+            info = musicDownloader.download(message.text,
+                                            telegram_audio_limit)
+            downloads = info['downloads']
+            audio_file = downloads['audio']
+            thumbnail_file = downloads['thumbnail']
+            squarethumb_file = DOWNLOAD_DIR + \
+                info['extractor'] + info['id'] + "_squarethumb.jpg"
+            squarethumbMaker.make_squarethumb(thumbnail_file,
+                                              squarethumb_file)
+            with open(audio_file, "rb") as audio, \
+                 open(squarethumb_file, "rb") as thumb:
+                title = info['title']
+                url = info['webpage_url']
+                performer = info['uploader']
+                duration = int(float(info['duration']))
+                caption = "<b><a href=\"" + url + "\">" + title + "</a></b>"
+                await types.ChatActions.upload_document()
+                if message.chat.type == "private":
+                    keep_message = False
+                else:
+                    keep_message = True
+                await message.reply_audio(audio,
+                                          caption=caption,
+                                          parse_mode=ParseMode.HTML,
+                                          duration=duration,
+                                          performer=performer,
+                                          title=title,
+                                          thumb=thumb,
+                                          reply=keep_message)
+            for f in audio_file, thumbnail_file, squarethumb_file:
+                os.remove(f)
+            if not keep_message:
+                await message.delete()
+        except music_grabber.WrongFileSizeError as e:
+            logger.error(str(e))
+            inform = await message.reply("This won't be downloaded because "
+                                         "its audio file size is greater "
+                                         "than 50M",
+                                         disable_notification=True)
+            await self.__deleteMessage(60, inform)
+        except music_grabber.WrongCategoryError as e:
+            logger.error(str(e))
         except Exception as e:
-            await message.reply("I've tried downloading this video but " +
-                                "caught the following error: `" +
-                                str(e) + "`\\.\n\n" +
-                                "*Please report it to @konnov*",
-                                parse_mode=ParseMode.MARKDOWN_V2)
+            await message.reply("<b>Error</b>: <code>" + str(e) +
+                                "</code>", parse_mode=ParseMode.HTML,
+                                disable_notification=True)
 
-    # https://stackoverflow.com/a/52177551
-    def __make_squarethumb(self, img_url, output):
-        original_thumb = Image.open(urlopen(img_url))
-        squarethumb = self.__crop_to_square(original_thumb)
-        squarethumb.thumbnail((320, 320), Image.ANTIALIAS)
-        squarethumb.save(output)
-
-    def __crop_to_square(self, img):
-        width, height = img.size
-        length = min(width, height)
-        left = (width - length)/2
-        top = (height - length)/2
-        right = (width + length)/2
-        bottom = (height + length)/2
-        return img.crop((left, top, right, bottom))
+    async def __deleteMessage(self, delay, message):
+        await asyncio.sleep(delay)
+        await message.delete()

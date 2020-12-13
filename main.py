@@ -16,7 +16,8 @@ bot = Bot(
 dp = Dispatcher(
     bot=bot,
 )
-textHandler = TextHandler()
+
+textHandler = TextHandler(bot)
 commandHandler = CommandHandler()
 newMembersHandler = NewMembersHandler(bot)
 
@@ -36,7 +37,8 @@ async def process_callback(callback: types.CallbackQuery):
 @dp.message_handler(content_types=types.ContentType.TEXT)
 async def process_text_message(message: types.Message):
     if message.is_command():
-        await commandHandler.handle(message)
+        bot_username = (await bot.get_me()).username
+        await commandHandler.handle(bot_username, message)
     else:
         await textHandler.handle(message)
 

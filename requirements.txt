@@ -1,5 +1,5 @@
 aiohttp
 ujson
 aiogram
-pytube
+youtube-dl
 Pillow

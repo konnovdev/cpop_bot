@@ -13,3 +13,6 @@ __pycache__/
 
 /config.py
 /downloads/
+
+# vim
+[._]*.sw[a-p]
