@@ -7,8 +7,9 @@ Features:
 
 ### Set up
 
-Check `config_example.py` for configuration examples,
-create your own `config.py`, setup virtualenv and install dependencies
+- create `config.py` (check `config_example.py`)
+- install `libwebp-devel`, clear cache of pip (`~/.cache/pip` on linux distro) for building wheel for Pillow
+- setup virtualenv and install dependencies
 
 ```
 $ virtualenv venv
