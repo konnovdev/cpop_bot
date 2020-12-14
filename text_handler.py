@@ -5,6 +5,7 @@ from aiogram import types, Bot
 from aiogram.types import ParseMode
 import music_grabber
 import config
+from constants import ERROR_REPORT, ERROR_DELETE
 
 telegram_audio_limit = 52428800
 music_sites = ("youtu.be/", "youtube.com/watch?v=", "soundcloud.com/")
@@ -12,6 +13,7 @@ WHITELIST_CHAT_ID = config.WHITELIST_CHAT_ID
 AVAILABILITY_HTML = config.AVAILABILITY_HTML
 GROUP_CHAT_ID = config.GROUP_CHAT_ID
 DOWNLOAD_DIR = config.DOWNLOAD_DIR
+DEV_ID = config.DEV_ID
 
 logger = logging.getLogger(__name__)
 musicDownloader = music_grabber.MusicDownloader()
@@ -86,18 +88,44 @@ class TextHandler:
                 await message.delete()
         except music_grabber.WrongFileSizeError as e:
             logger.error(str(e))
-            inform = await message.reply("This won't be downloaded because "
-                                         "its audio file size is greater "
-                                         "than 50M",
-                                         disable_notification=True)
-            await self.__deleteMessage(60, inform)
+            text = "This won't be downloaded because its audio file size " + \
+                "greater than 50M"
+            inform = await message.reply(text, disable_notification=True)
+            await self.__delete_message(60, inform)
         except music_grabber.WrongCategoryError as e:
             logger.error(str(e))
         except Exception as e:
-            await message.reply("<b>Error</b>: <code>" + str(e) +
-                                "</code>", parse_mode=ParseMode.HTML,
-                                disable_notification=True)
+            markup = self.__make_inline_keyboard()
+            error_html = "<b>URL</b>: " + message.text + \
+                "\n<b>Error</b>: <code>" + str(e) + "</code>"
+            await message.reply(error_html, parse_mode=ParseMode.HTML,
+                                disable_web_page_preview=True,
+                                disable_notification=True, reply_markup=markup)
 
-    async def __deleteMessage(self, delay, message):
+    def __make_inline_keyboard(self):
+        markup = types.InlineKeyboardMarkup(reasize_keyboard=True)
+        item1 = types.InlineKeyboardButton("Report Error",
+                                           callback_data=ERROR_REPORT)
+        item2 = types.InlineKeyboardButton("Delete Only",
+                                           callback_data=ERROR_DELETE)
+        markup.add(item1, item2)
+        return markup
+
+    async def callback_error_message(self, callback: types.CallbackQuery):
+        from_chat_id = callback.message.chat.id
+        message_id = callback.message.message_id
+        callback_data = callback.data
+        if callback_data == ERROR_REPORT:
+            answer_text = "Successfully forward the error message to dev!"
+            await self.bot.forward_message(chat_id=DEV_ID,
+                                           from_chat_id=from_chat_id,
+                                           message_id=message_id)
+            await self.bot.answer_callback_query(callback.id, text=answer_text,
+                                                 show_alert=False)
+            await self.__delete_message(3, callback.message)
+        elif callback.data == ERROR_DELETE:
+            await callback.message.delete()
+
+    async def __delete_message(self, delay, message):
         await asyncio.sleep(delay)
         await message.delete()

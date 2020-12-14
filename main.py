@@ -3,7 +3,7 @@ from aiogram import Bot, Dispatcher, executor, types
 
 import config
 from command_handler import CommandHandler
-from constants import CAPTCHA_SUCCESS
+from constants import CAPTCHA_SUCCESS, ERROR_REPORT, ERROR_DELETE
 from new_members_handler import NewMembersHandler
 from text_handler import TextHandler
 
@@ -32,6 +32,8 @@ async def process_callback(callback: types.CallbackQuery):
     if callback.message:
         if callback.data == CAPTCHA_SUCCESS:
             await newMembersHandler.handleCaptchaCallback(callback)
+        elif callback.data in (ERROR_REPORT, ERROR_DELETE):
+            await textHandler.callback_error_message(callback)
 
 
 @dp.message_handler(content_types=types.ContentType.TEXT)
