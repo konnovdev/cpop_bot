@@ -1,13 +1,10 @@
 import os
 import logging
-from youtube_dl import YoutubeDL
 from urllib.parse import urlparse
-from urllib.request import Request
-from urllib.request import urlopen
+from urllib.request import Request, urlopen
+from youtube_dl import YoutubeDL
 from PIL import Image
-import config
-
-DOWNLOAD_DIR = config.DOWNLOAD_DIR
+from config import DOWNLOAD_DIR
 
 logger = logging.getLogger(__name__)
 
@@ -23,6 +20,7 @@ class WrongFileSizeError(ValueError):
 class MusicDownloader:
 
     def download(self, input_url, filesize_limit):
+        input_url = input_url.split('&list', 1)[0]
         ydl_opts = {
                 'format': 'bestaudio[protocol^=http]',
                 'outtmpl': DOWNLOAD_DIR + '%(extractor)s_%(id)s.%(ext)s',
@@ -35,19 +33,19 @@ class MusicDownloader:
                             if item['format_id'] == info['format_id']),
                            None)
 
-        if self.__youtubeVideoNotMusic(info):
+        if self.youtube_video_not_music(info):
             raise WrongCategoryError(webpage_info +
                                      ": not under Music category")
 
-        audio_filesize = self.__getFileSize(info_format)
+        audio_filesize = self.__get_filesize(info_format)
         if int(audio_filesize) < filesize_limit:
             logger.info(webpage_info + ": downloading...")
             ydl.process_info(info)
-            info = self.__addDownloadsToInfoDict(info)
-            if self.__filesSuccessfullyDownloaded(info['downloads']):
+            info = self.__add_downloads_to_info_dict(info)
+            if self.__files_successfully_downloaded(info['downloads']):
                 return info
             else:
-                self.__deleteDownloadedFiles(info['downloads'])
+                self.__delete_downloaded_files(info['downloads'])
                 raise ValueError(webpage_info +
                                  ": failed to download audio or thumbnail")
         else:
@@ -56,14 +54,14 @@ class MusicDownloader:
                                      "than the limit: (" +
                                      str(filesize_limit) + ")")
 
-    def __youtubeVideoNotMusic(self, info):
+    def youtube_video_not_music(self, info):
         if info['extractor'] == 'youtube' and \
                 'Music' not in info['categories']:
             return True
         else:
             return False
 
-    def __getFileSize(self, info_format):
+    def __get_filesize(self, info_format):
         if 'filesize' in info_format:
             audio_filesize = info_format['filesize']
         else:
@@ -74,13 +72,13 @@ class MusicDownloader:
             audio_filesize = urlopen(request_head).headers['Content-Length']
         return audio_filesize
 
-    def __addDownloadsToInfoDict(self, info):
+    def __add_downloads_to_info_dict(self, info):
         webpage_id = info['id']
         extractor = info['extractor']
         thumbnail_url = info['thumbnail']
         basename = DOWNLOAD_DIR + extractor + '_' + webpage_id
         thumbnail_file = basename + "." + \
-            self.__getFileExtensionFromUrl(thumbnail_url)
+            self.__get_file_extension_from_url(thumbnail_url)
         audio_file = basename + '.' + info['ext']
         info['downloads'] = {
                 'audio': audio_file,
@@ -88,17 +86,17 @@ class MusicDownloader:
         }
         return info
 
-    def __filesSuccessfullyDownloaded(self, info_downloads):
+    def __files_successfully_downloaded(self, info_downloads):
         return all(os.path.isfile(f) for f in info_downloads.values())
 
-    def __deleteDownloadedFiles(self, info_downloads):
+    def __delete_downloaded_files(self, info_downloads):
         for f in info_downloads.values():
             try:
                 os.remove(f)
             except OSError:
                 pass
 
-    def __getFileExtensionFromUrl(self, url):
+    def __get_file_extension_from_url(self, url):
         url_path = urlparse(url).path
         basename = os.path.basename(url_path)
         ext = basename.split(".")[-1]
