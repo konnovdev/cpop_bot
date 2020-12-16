@@ -3,8 +3,8 @@ import logging
 import asyncio
 from aiogram import types, Bot
 from aiogram.types import ParseMode
-import music_grabber
-from constants import ERROR_REPORT, ERROR_DELETE
+from . import music_grabber
+from .constants import ERROR_REPORT, ERROR_DELETE
 from config import PROMOTION_LIST_CHAT_ID, DEV_ID, WHITELIST_CHAT_ID
 from config import AVAILABILITY_HTML, DOWNLOAD_DIR
 

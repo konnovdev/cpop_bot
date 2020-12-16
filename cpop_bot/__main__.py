@@ -1,9 +1,9 @@
 import logging
 from aiogram import Bot, Dispatcher, executor, types
-from command_handler import CommandHandler
-from new_members_handler import NewMembersHandler
-from text_handler import TextHandler
-from constants import CAPTCHA_SUCCESS, ERROR_REPORT, ERROR_DELETE
+from .command_handler import CommandHandler
+from .new_members_handler import NewMembersHandler
+from .text_handler import TextHandler
+from .constants import CAPTCHA_SUCCESS, ERROR_REPORT, ERROR_DELETE
 import config
 
 logging.basicConfig(level=logging.DEBUG)

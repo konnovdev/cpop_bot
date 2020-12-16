@@ -19,4 +19,4 @@ $ pip install -r requirements.txt
 
 Run the bot
 
-`$ python3 main.py`
+`$ venv/bin/python3 -m cpop_bot`
