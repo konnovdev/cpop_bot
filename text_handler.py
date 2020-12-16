@@ -5,7 +5,7 @@ from aiogram import types, Bot
 from aiogram.types import ParseMode
 import music_grabber
 from constants import ERROR_REPORT, ERROR_DELETE
-from config import GROUP_CHAT_ID, DEV_ID, WHITELIST_CHAT_ID
+from config import PROMOTION_LIST_CHAT_ID, DEV_ID, WHITELIST_CHAT_ID
 from config import AVAILABILITY_HTML, DOWNLOAD_DIR
 
 TELEGRAM_UPLOAD_LIMIT = 52428800
@@ -25,7 +25,7 @@ class TextHandler:
         self.bot = bot
 
     async def handle(self, message: types.Message):
-        if not await self.__is_provide_service(message):
+        if not await self.__should_provide_service(message):
             return
         text = message.text
         if self.__is_url_for_music_download(text):
@@ -36,19 +36,21 @@ class TextHandler:
             await self.__delete_messages(DELAY_DELETE_IN_SEC_PING,
                                          (pong, message))
 
-    async def __is_provide_service(self, message: types.Message):
+    async def __should_provide_service(self, message: types.Message):
         chat_id = message.chat.id
         if chat_id in WHITELIST_CHAT_ID:
             return True
         chat_type = message.chat.type
         if chat_type == "private":
-            member = await self.bot.get_chat_member(GROUP_CHAT_ID, chat_id)
-            if member.is_chat_member():
-                return True
-            else:
-                await message.reply(AVAILABILITY_HTML,
-                                    parse_mode=ParseMode.HTML)
-                return False
+            user_id = chat_id
+            for promotion_chat in PROMOTION_LIST_CHAT_ID:
+                if (await self.bot.get_chat_member(
+                        promotion_chat, user_id)).is_chat_member():
+                    return True
+                else:
+                    await message.reply(AVAILABILITY_HTML,
+                                        parse_mode=ParseMode.HTML)
+                    return False
         else:
             return False
 

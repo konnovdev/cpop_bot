@@ -1,12 +1,15 @@
 ACCESS_TOKEN = "123456:ABC-DEF1234ghIkl-zyx57W2v1u123ew11"
 DEV_ID = 2011545269
-GROUP_CHAT_ID = -1001853277651
-WHITELIST_CHAT_ID = (
-    GROUP_CHAT_ID,
+PROMOTION_LIST_CHAT_ID = (
+    -1001853277651,
+    -1001748900794
+    )
+WHITELIST_CHAT_ID = PROMOTION_LIST_CHAT_ID + (
     DEV_ID,
     8557378983
     )
 USER_CAPTCHA_TIMEOUT_IN_MINUTES = 60
+DELETE_JOIN_MESSAGE = True
 AVAILABILITY_HTML = ("This bot only serves cpop.tw group @mandopop and its "
                      "group members in private chat.")
 CONTACTS_HTML = ("Regarding any issues with the bot feel free to contact "

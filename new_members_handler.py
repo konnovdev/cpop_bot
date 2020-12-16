@@ -4,7 +4,7 @@ from typing import List
 from aiogram import types, Bot
 from aiogram.types import ParseMode
 from constants import CAPTCHA_SUCCESS
-from config import USER_CAPTCHA_TIMEOUT_IN_MINUTES
+from config import USER_CAPTCHA_TIMEOUT_IN_MINUTES, DELETE_JOIN_MESSAGE
 
 logger = logging.getLogger(__name__)
 
@@ -46,7 +46,8 @@ class NewMembersHandler:
             "<b>Welcome</b> {0},\nAre you a human or a spam bot?"
             .format(self.__get_mention(message.from_user)),
             reply_markup=markup, parse_mode=ParseMode.HTML, reply=False)
-        await message.delete()
+        if DELETE_JOIN_MESSAGE:
+            await message.delete()
         pending_user = PendingUser(message.from_user.id, replied_message,
                                    datetime.now())
         self.pending_users.append(pending_user)
