@@ -3,8 +3,8 @@ from datetime import datetime
 from typing import List
 from aiogram import types, Bot
 from aiogram.types import ParseMode
-from .constants import CAPTCHA_SUCCESS
 from config import USER_CAPTCHA_TIMEOUT_IN_MINUTES, DELETE_JOIN_MESSAGE
+from .constants import CAPTCHA_SUCCESS
 
 logger = logging.getLogger(__name__)
 

@@ -16,7 +16,7 @@ class CommandHandler:
         elif message.text == "/start":
             await self.__handle_start(message)
         else:
-            logger.debug("USER TYPED UNKNOWN COMMAND " + message.text)
+            logger.debug("USER TYPED UNKNOWN COMMAND %s", message.text)
 
     async def __handle_about(self, message):
         await message.reply(text=ABOUT_HTML, parse_mode=ParseMode.HTML)
