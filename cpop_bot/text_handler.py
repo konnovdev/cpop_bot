@@ -47,11 +47,8 @@ class TextHandler:
                 if (await self.bot.get_chat_member(
                         promotion_chat, user_id)).is_chat_member():
                     return True
-                await message.reply(AVAILABILITY_HTML,
-                                    parse_mode=ParseMode.HTML)
-                return False
-        else:
-            return False
+            await message.reply(AVAILABILITY_HTML, parse_mode=ParseMode.HTML)
+        return False
 
     async def __handle_music_grabber(self, message: types.Message):
         try:
