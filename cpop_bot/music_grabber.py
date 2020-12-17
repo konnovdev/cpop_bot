@@ -38,28 +38,26 @@ class MusicDownloader:
                                      ": not under Music category")
 
         audio_filesize = self.__get_filesize(info_format)
-        if int(audio_filesize) < filesize_limit:
-            logger.info(webpage_info + ": downloading...")
-            ydl.process_info(info)
-            info = self.__add_downloads_to_info_dict(info)
-            if self.__files_successfully_downloaded(info['downloads']):
-                return info
-            else:
-                self.__delete_downloaded_files(info['downloads'])
-                raise ValueError(webpage_info +
-                                 ": failed to download audio or thumbnail")
-        else:
+        if int(audio_filesize) > filesize_limit:
             raise WrongFileSizeError(webpage_info + ": audio file size (" +
                                      str(audio_filesize) + ") is greater" +
                                      "than the limit: (" +
                                      str(filesize_limit) + ")")
 
+        logger.info("%s: downloading...", webpage_info)
+        ydl.process_info(info)
+        info = self.__add_downloads_to_info_dict(info)
+        if not self.__files_successfully_downloaded(info['downloads']):
+            self.__delete_downloaded_files(info['downloads'])
+            raise ValueError(webpage_info +
+                             ": failed to download audio or thumbnail")
+        return info
+
     def youtube_video_not_music(self, info):
         if info['extractor'] == 'youtube' and \
                 'Music' not in info['categories']:
             return True
-        else:
-            return False
+        return False
 
     def __get_filesize(self, info_format):
         if 'filesize' in info_format:

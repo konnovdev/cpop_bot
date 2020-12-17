@@ -3,10 +3,10 @@ import logging
 import asyncio
 from aiogram import types, Bot
 from aiogram.types import ParseMode
-from . import music_grabber
-from .constants import ERROR_REPORT, ERROR_DELETE
 from config import PROMOTION_LIST_CHAT_ID, DEV_ID, WHITELIST_CHAT_ID
 from config import AVAILABILITY_HTML, DOWNLOAD_DIR
+from . import music_grabber
+from .constants import ERROR_REPORT, ERROR_DELETE
 
 TELEGRAM_UPLOAD_LIMIT = 52428800
 DELAY_DELETE_IN_SEC_PING = 5
@@ -47,10 +47,9 @@ class TextHandler:
                 if (await self.bot.get_chat_member(
                         promotion_chat, user_id)).is_chat_member():
                     return True
-                else:
-                    await message.reply(AVAILABILITY_HTML,
-                                        parse_mode=ParseMode.HTML)
-                    return False
+                await message.reply(AVAILABILITY_HTML,
+                                    parse_mode=ParseMode.HTML)
+                return False
         else:
             return False
 
@@ -112,8 +111,7 @@ class TextHandler:
                 and not ('/sets/' in text and '?in=' not in text) \
                 and any(site in text for site in music_sites):
             return True
-        else:
-            return False
+        return False
 
     def __make_inline_keyboard(self):
         markup = types.InlineKeyboardMarkup(reasize_keyboard=True)
