@@ -23,7 +23,9 @@ class MusicDownloader:
         input_url = input_url.split('&list', 1)[0]
         ydl_opts = {
                 'format': 'bestaudio[protocol^=http]',
-                'outtmpl': DOWNLOAD_DIR + '%(extractor)s_%(id)s.%(ext)s',
+                'logger': logger,
+                'outtmpl': DOWNLOAD_DIR +
+                '%(title)s - %(extractor)s-%(id)s.%(ext)s',
                 'writethumbnail': True
         }
         ydl = YoutubeDL(ydl_opts)
@@ -46,7 +48,7 @@ class MusicDownloader:
 
         logger.info("%s: downloading...", webpage_info)
         ydl.process_info(info)
-        info = self.__add_downloads_to_info_dict(info)
+        info = self.__add_downloads_to_info_dict(info, ydl_opts)
         if not self.__files_successfully_downloaded(info['downloads']):
             self.__delete_downloaded_files(info['downloads'])
             raise ValueError(webpage_info +
@@ -70,14 +72,11 @@ class MusicDownloader:
             audio_filesize = urlopen(request_head).headers['Content-Length']
         return audio_filesize
 
-    def __add_downloads_to_info_dict(self, info):
-        webpage_id = info['id']
-        extractor = info['extractor']
+    def __add_downloads_to_info_dict(self, info, ydl_opts):
         thumbnail_url = info['thumbnail']
-        basename = DOWNLOAD_DIR + extractor + '_' + webpage_id
-        thumbnail_file = basename + "." + \
+        audio_file = YoutubeDL(ydl_opts).prepare_filename(info)
+        thumbnail_file = audio_file.rsplit(".", 1)[-2] + "." + \
             self.__get_file_extension_from_url(thumbnail_url)
-        audio_file = basename + '.' + info['ext']
         info['downloads'] = {
                 'audio': audio_file,
                 'thumbnail': thumbnail_file
@@ -97,8 +96,7 @@ class MusicDownloader:
     def __get_file_extension_from_url(self, url):
         url_path = urlparse(url).path
         basename = os.path.basename(url_path)
-        ext = basename.split(".")[-1]
-        return ext
+        return basename.split(".")[-1]
 
 
 class SquarethumbMaker:
