@@ -8,12 +8,12 @@ DEV_ID = 2011545269  # errors will be forwarded to this user ID
 PROMOTION_LIST_CHAT_ID = (
     -1001853277651,
     -1001748900794
-    )
+)
 
 WHITELIST_CHAT_ID = PROMOTION_LIST_CHAT_ID + (
     DEV_ID,
     8557378983
-    )
+)
 
 # Configure a response to `/help` message
 AVAILABILITY_HTML = ("This bot only serves cpop.tw group @mandopop and its "
