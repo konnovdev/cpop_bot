@@ -68,8 +68,8 @@ class NewMembersHandler:
 
     async def __purge_old_captchas(self):
         for pending_user in self.pending_users:
-            time_passed = (datetime.now() -
-                           pending_user.timestamp).total_seconds() / 60
+            time_passed = (datetime.now()
+                           - pending_user.timestamp).total_seconds() / 60
             if time_passed > USER_CAPTCHA_TIMEOUT_IN_MINUTES:
                 self.pending_users.remove(pending_user)
                 await pending_user.captcha_message.delete()

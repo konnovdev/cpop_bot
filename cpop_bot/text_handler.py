@@ -5,7 +5,8 @@ from aiogram import types, Bot
 from aiogram.types import ParseMode
 from config import PROMOTION_LIST_CHAT_ID, DEV_ID, WHITELIST_CHAT_ID
 from config import AVAILABILITY_HTML, DOWNLOAD_DIR
-from . import music_grabber
+from .music_grabber import download_audio, make_squarethumb
+from .music_grabber import WrongFileSizeError, WrongCategoryError
 from .constants import ERROR_REPORT, ERROR_DELETE
 
 TELEGRAM_UPLOAD_LIMIT = 52428800
@@ -15,8 +16,6 @@ DELAY_DELETE_IN_SEC_REPORT_ERROR = 3
 music_sites = ("youtu.be/", "youtube.com/watch?v=", "soundcloud.com/")
 
 logger = logging.getLogger(__name__)
-musicDownloader = music_grabber.MusicDownloader()
-squarethumbMaker = music_grabber.SquarethumbMaker()
 
 
 class TextHandler:
@@ -52,15 +51,13 @@ class TextHandler:
 
     async def __handle_music_grabber(self, message: types.Message):
         try:
-            info = musicDownloader.download(message.text,
-                                            TELEGRAM_UPLOAD_LIMIT)
+            info = download_audio(message.text, TELEGRAM_UPLOAD_LIMIT)
             downloads = info['downloads']
             audio_file = downloads['audio']
             thumbnail_file = downloads['thumbnail']
             squarethumb_file = DOWNLOAD_DIR + \
                 info['extractor'] + info['id'] + "_squarethumb.jpg"
-            squarethumbMaker.make_squarethumb(thumbnail_file,
-                                              squarethumb_file)
+            make_squarethumb(thumbnail_file, squarethumb_file)
             with open(audio_file, "rb") as audio, \
                  open(squarethumb_file, "rb") as thumb:
                 title = info['title']
@@ -85,14 +82,14 @@ class TextHandler:
                 os.remove(f)
             if not keep_message:
                 await message.delete()
-        except music_grabber.WrongFileSizeError as e:
+        except WrongFileSizeError as e:
             logger.error(str(e))
             text = "This won't be downloaded because its audio file size " + \
                 "is greater than 50M"
             inform = await message.reply(text, disable_notification=True)
             await self.__delete_messages(DELAY_DELETE_IN_SEC_SIZE_WARNING,
                                          (inform, ))
-        except music_grabber.WrongCategoryError as e:
+        except WrongCategoryError as e:
             logger.error(str(e))
         except Exception as e:
             markup = self.__make_inline_keyboard()
