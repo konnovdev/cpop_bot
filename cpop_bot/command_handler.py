@@ -19,10 +19,12 @@ class CommandHandler:
             logger.debug("USER TYPED UNKNOWN COMMAND %s", message.text)
 
     async def __handle_about(self, message):
-        await message.reply(text=ABOUT_HTML, parse_mode=ParseMode.HTML)
+        await message.reply(text=ABOUT_HTML, parse_mode=ParseMode.HTML,
+                            disable_web_page_preview=True)
 
     async def __handle_help(self, message):
-        await message.reply(text=HELP_HTML, parse_mode=ParseMode.HTML)
+        await message.reply(text=HELP_HTML, parse_mode=ParseMode.HTML,
+                            disable_web_page_preview=True)
 
     async def __handle_start(self, message):
         with open('static/hello_animated_sticker.tgs', 'rb') as sticker:
