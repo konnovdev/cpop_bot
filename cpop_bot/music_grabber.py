@@ -22,11 +22,11 @@ class MusicDownloader:
     def download(self, input_url, filesize_limit):
         input_url = input_url.split('&list', 1)[0]
         ydl_opts = {
-                'format': 'bestaudio[protocol^=http]',
-                'logger': logger,
-                'outtmpl': DOWNLOAD_DIR +
-                '%(title)s - %(extractor)s-%(id)s.%(ext)s',
-                'writethumbnail': True
+            'format': 'bestaudio[protocol^=http]',
+            'logger': logger,
+            'outtmpl': DOWNLOAD_DIR
+            + '%(title)s - %(extractor)s-%(id)s.%(ext)s',
+            'writethumbnail': True
         }
         ydl = YoutubeDL(ydl_opts)
         info = ydl.extract_info(input_url, download=False)
@@ -36,23 +36,23 @@ class MusicDownloader:
                            None)
 
         if self.youtube_video_not_music(info):
-            raise WrongCategoryError(webpage_info +
-                                     ": not under Music category")
+            raise WrongCategoryError(webpage_info
+                                     + ": not under Music category")
 
         audio_filesize = self.__get_filesize(info_format)
         if int(audio_filesize) > filesize_limit:
-            raise WrongFileSizeError(webpage_info + ": audio file size (" +
-                                     str(audio_filesize) + ") is greater" +
-                                     "than the limit: (" +
-                                     str(filesize_limit) + ")")
+            raise WrongFileSizeError(webpage_info + ": audio file size ("
+                                     + str(audio_filesize) + ") is greater"
+                                     + "than the limit: ("
+                                     + str(filesize_limit) + ")")
 
         logger.info("%s: downloading...", webpage_info)
         ydl.process_info(info)
         info = self.__add_downloads_to_info_dict(info, ydl_opts)
         if not self.__files_successfully_downloaded(info['downloads']):
             self.__delete_downloaded_files(info['downloads'])
-            raise ValueError(webpage_info +
-                             ": failed to download audio or thumbnail")
+            raise ValueError(webpage_info
+                             + ": failed to download audio or thumbnail")
         return info
 
     def youtube_video_not_music(self, info):
@@ -78,8 +78,8 @@ class MusicDownloader:
         thumbnail_file = audio_file.rsplit(".", 1)[-2] + "." + \
             self.__get_file_extension_from_url(thumbnail_url)
         info['downloads'] = {
-                'audio': audio_file,
-                'thumbnail': thumbnail_file
+            'audio': audio_file,
+            'thumbnail': thumbnail_file
         }
         return info
 
@@ -111,8 +111,8 @@ class SquarethumbMaker:
     def __crop_to_square(self, img):
         width, height = img.size
         length = min(width, height)
-        left = (width - length)/2
-        top = (height - length)/2
-        right = (width + length)/2
-        bottom = (height + length)/2
+        left = (width - length) / 2
+        top = (height - length) / 2
+        right = (width + length) / 2
+        bottom = (height + length) / 2
         return img.crop((left, top, right, bottom))

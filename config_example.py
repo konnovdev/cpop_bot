@@ -25,10 +25,10 @@ ABOUT_HTML = ("This bot is going to manage cpop.tw.\n"
               "whenever you send the link and makes new members go through "
               "captcha.\n\n"
               "<i>Source code available at cpop.tw/code under GPLv3 "
-              "license</i>\n\n" +
-              CONTACTS_HTML)
-HELP_HTML = (AVAILABILITY_HTML +
-             "\n\n<b>Usage</b>:\n"
+              "license</i>\n\n"
+              + CONTACTS_HTML)
+HELP_HTML = (AVAILABILITY_HTML
+             + "\n\n<b>Usage</b>:\n"
              "- send a message that only contains a link of a YouTube video "
              "or a SoundCloud track.\n"
              "- Playlists are not supported, but you can select multiple "
@@ -36,8 +36,8 @@ HELP_HTML = (AVAILABILITY_HTML +
              "- Your message will be deleted in private chat after the music "
              "gets successfully uploaded.\n"
              "- You can get YouTube links with inline bot @vid and use "
-             "them.\n\n" +
-             CONTACTS_HTML)
+             "them.\n\n"
+             + CONTACTS_HTML)
 
 # Music will be temporary downloaded to this destination
 # and then automatically deleted once the bot uploaded it
