@@ -1,10 +1,13 @@
 import logging
+import asyncio
 from datetime import datetime
 from typing import List
 from aiogram import types, Bot
 from aiogram.types import ParseMode
 from config import USER_CAPTCHA_TIMEOUT_IN_MINUTES, DELETE_JOIN_MESSAGE
 from .constants import CAPTCHA_SUCCESS
+
+DELAY_DELETE_CONGRATS = 60
 
 logger = logging.getLogger(__name__)
 
@@ -78,7 +81,8 @@ class NewMembersHandler:
         chat_id = callback.message.chat.id
         message_id = callback.message.message_id
         from_user_id = callback.from_user.id
-        pending_user_id = self.__get_pending_user(message_id, chat_id).user_id
+        pending_user = self.__get_pending_user(message_id, chat_id)
+        pending_user_id = pending_user.user_id
         if pending_user_id != from_user_id:
             await self.bot.answer_callback_query(
                 callback.id,
@@ -87,7 +91,7 @@ class NewMembersHandler:
                     .user.first_name),
                 show_alert=False)
         else:
-            await self.bot.edit_message_text(
+            congrats = await self.bot.edit_message_text(
                 chat_id=chat_id, message_id=message_id,
                 text="Congrats {0}, captcha passed".format(
                     self.__get_mention(callback.from_user)),
@@ -97,6 +101,12 @@ class NewMembersHandler:
                 from_user_id,
                 types.ChatPermissions(True, True, True, True,
                                       True, True, True, True))
+            self.pending_users.remove(pending_user)
+            await self.__delay_delete_message(DELAY_DELETE_CONGRATS, congrats)
+
+    async def __delay_delete_message(self, delay, message: types.Message):
+        await asyncio.sleep(delay)
+        await message.delete()
 
     def __get_pending_user(self, message_id, chat_id):
         for pending_user in self.pending_users:
