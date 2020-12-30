@@ -17,6 +17,10 @@ $ source venv/bin/activate
 $ pip install -r requirements.txt
 ```
 
-Run the bot
+Run the bot in foreground with
 
 `$ venv/bin/python3 -m cpop_bot`
+
+or in the background with
+
+`$ nohup venv/bin/python3 -m cpop_bot &`
