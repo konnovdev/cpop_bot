@@ -4,7 +4,6 @@ to square thumbnail and upload to Telegram
 Send a link as a reply to bypass Music category check
 
 # requirements.txt
-OpenCC
 Pillow
 youtube-dl
 
@@ -31,7 +30,6 @@ from pyrogram.types import Message
 from pyrogram.errors import UserNotParticipant
 from youtube_dl import YoutubeDL
 from PIL import Image
-from opencc import OpenCC
 from config import MUSIC_CHATS, MUSIC_USERS, MUSIC_DELAY_DELETE_INFORM
 from config import MUSIC_INFORM_AVAILABILITY, MUSIC_MAX_LENGTH
 
@@ -45,7 +43,6 @@ SITES_REGEX = (
 EXCLUDE_PLAYLISTS = (
     r"\/playlist\?list=|&list=|\/sets\/"
 )
-s2tw = OpenCC('s2tw.json').convert
 
 
 @Client.on_message(filters.text
@@ -147,10 +144,10 @@ async def _upload_audio(message: Message, info_dict, audio_file):
     squarethumb_file = basename + "_squarethumb.jpg"
     make_squarethumb(thumbnail_file, squarethumb_file)
     webpage_url = info_dict['webpage_url']
-    title = s2tw(info_dict['title'])
+    title = info_dict['title']
     caption = f"<b><a href=\"{webpage_url}\">{title}</a></b>"
     duration = int(float(info_dict['duration']))
-    performer = s2tw(info_dict['uploader'])
+    performer = info_dict['uploader']
     await message.reply_audio(audio_file, caption=caption, duration=duration,
                               performer=performer, title=title,
                               parse_mode='HTML', thumb=squarethumb_file)
