@@ -8,14 +8,15 @@ A Telegram bot made with [Pyrogram Smart Plugins](https://docs.pyrogram.org/topi
 - A [Telegram API key](//docs.pyrogram.org/intro/setup#api-keys)
 - A [Telegram bot token](//t.me/botfather)
 
-## Run
+## Run with venv
 
 1. `virtualenv venv` to create a virtual environment
 2. install `python3-devel zlib-devel libjpeg-turbo-devel libwebp-devel`,
    clear cache of pip (`~/.cache/pip` on linux distro)
-   for building wheel for Pillow.
-   `venv/bin/pip install -U -r requirements.txt` to install the requirements
-3. Create a new `config.ini` file, copy-paste the following and replace the
+   for building wheel for Pillow. with apt:
+   `apt install -y python3-dev zlib1g-dev libjpeg-turbo8-dev libwebp-dev`
+3. `venv/bin/pip install -U -r requirements.txt` to install the requirements
+4. Create a new `config.ini` file, copy-paste the following and replace the
    values with your own. Exclude or include plugins to fit your needs.
    Create `config.py` and add constants that are specified in module docstrings
    of enabled plugins.
@@ -29,8 +30,14 @@ A Telegram bot made with [Pyrogram Smart Plugins](https://docs.pyrogram.org/topi
    root = plugins
    exclude = welcome
    ```
-4. Run with `venv/bin/python tgbot.py`
-5. Stop with <kbd>CTRL+C</kbd>
+5. Run with `venv/bin/python tgbot.py`
+6. Stop with <kbd>CTRL+C</kbd>
+
+## Run with docker
+
+1. Install docker and docker-compose
+2. Open the project directory in terminal and run `docker-compose up -d`
+3. You can stop the bot by executing `docker-compose down` (you must be in the project directory) 
 
 ## License
 
