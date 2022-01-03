@@ -1,19 +1,10 @@
-"""reply ping with pong
-
-# ../config.py
-# int | str | list
-PING_CHATS = -1234567890123
-# int | str | list
-PING_USERS = 1234567890
-PING_DELAY_DELETE = 8
-
-"""
 import asyncio
 from time import time
 from datetime import datetime
 from pyrogram import Client, filters
 from pyrogram.types import Message
-from config import PING_CHATS, PING_USERS, PING_DELAY_DELETE
+
+PING_DELAY_DELETE = 10
 
 START_TIME = datetime.utcnow()
 START_TIME_ISO = START_TIME.replace(microsecond=0).isoformat()
@@ -26,21 +17,7 @@ TIME_DURATION_UNITS = (
 )
 
 
-# https://gist.github.com/borgstrom/936ca741e885a1438c374824efb038b3
-def _human_time_duration(seconds):
-    if seconds == 0:
-        return 'inf'
-    parts = []
-    for unit, div in TIME_DURATION_UNITS:
-        amount, seconds = divmod(int(seconds), div)
-        if amount > 0:
-            parts.append('{} {}{}'
-                         .format(amount, unit, "" if amount == 1 else "s"))
-    return ', '.join(parts)
-
-
 @Client.on_message(filters.text
-                   & (filters.chat(PING_CHATS) | filters.user(PING_USERS))
                    & filters.incoming
                    & ~filters.edited
                    & filters.regex("ping"))
@@ -54,7 +31,6 @@ async def ping_pong(_, message: Message):
 
 
 @Client.on_message(filters.text
-                   & (filters.chat(PING_CHATS) | filters.user(PING_USERS))
                    & filters.incoming
                    & ~filters.edited
                    & filters.regex("uptime"))
@@ -67,6 +43,18 @@ async def get_uptime(_, message: Message):
                                      f"start time: `{START_TIME_ISO}`",
                                      quote=True)
     await _delay_delete_messages((reply, message), PING_DELAY_DELETE)
+
+
+def _human_time_duration(seconds):
+    if seconds == 0:
+        return 'inf'
+    parts = []
+    for unit, div in TIME_DURATION_UNITS:
+        amount, seconds = divmod(int(seconds), div)
+        if amount > 0:
+            parts.append('{} {}{}'
+                         .format(amount, unit, "" if amount == 1 else "s"))
+    return ', '.join(parts)
 
 
 async def _delay_delete_messages(messages: tuple, delay: int):

@@ -1,14 +1,4 @@
 """A Pyrogram Smart Plugin to verify if new members are human
-
-# ../config.py
-# int | str | list
-# the bot must be admin in the chat
-WELCOME_CHATS = -1234567890123
-# should not be lesser than 0.5 or the user may be banned if he didn't
-# press the verification button
-# recommend value: integer 2 or greater
-WELCOME_DELAY_KICK_MIN = 2
-
 """
 import asyncio
 from datetime import datetime
@@ -16,14 +6,20 @@ from pyrogram import Client, filters
 from pyrogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton
 from pyrogram.types import ChatPermissions
 from pyrogram.errors.exceptions.bad_request_400 import UserNotParticipant
-from config import WELCOME_CHATS, WELCOME_DELAY_KICK_MIN
+from config import WELCOME_CAPTCHA_CHATS
 
+WELCOME_DELAY_KICK_MIN = 3
 WELCOME_DELAY_KICK_SEC = WELCOME_DELAY_KICK_MIN * 60
 
 
-@Client.on_message(filters.chat(WELCOME_CHATS) & filters.new_chat_members)
-async def welcome(_, message: Message):
+@Client.on_message(filters.new_chat_members)
+async def welcome(client: Client, message: Message):
     """Mute new member and send message with button"""
+    if not await __is_bot_admin(client, message.chat.id):
+        return
+    if message.chat.id not in WELCOME_CAPTCHA_CHATS \
+            and len(WELCOME_CAPTCHA_CHATS) != 0:
+        return
     new_members = [f"{u.mention}" for u in message.new_chat_members]
     text = (f"Welcome, {', '.join(new_members)}\n**Are you human?**\n"
             "You will be removed from this chat if you are not verified "
@@ -36,7 +32,7 @@ async def welcome(_, message: Message):
                 [
                     InlineKeyboardButton(
                         "Press Here to Verify",
-                        callback_data="pressed_button"
+                        callback_data="pressed_captcha_button"
                     )
                 ]
             ]
@@ -46,7 +42,13 @@ async def welcome(_, message: Message):
     await kick_restricted_after_delay(WELCOME_DELAY_KICK_SEC, button_message)
 
 
-@Client.on_callback_query(filters.regex("pressed_button"))
+async def __is_bot_admin(client: Client, chat_id):
+    bot_id = (await client.get_me()).id
+    bot_chat_member = await client.get_chat_member(chat_id, bot_id)
+    return bot_chat_member.can_restrict_members
+
+
+@Client.on_callback_query(filters.regex("pressed_captcha_button"))
 async def callback_query_welcome_button(_, callback_query):
     """After the new member press the button, set his permissions to
     chat permissions, delete button message and join message
@@ -78,7 +80,8 @@ async def kick_restricted_after_delay(delay, button_message: Message):
     await _ban_restricted_user_until_date(group_chat, user_id, duration=delay)
 
 
-@Client.on_message(filters.chat(WELCOME_CHATS) & filters.left_chat_member)
+@Client.on_message(filters.chat(WELCOME_CAPTCHA_CHATS)
+                   & filters.left_chat_member)
 async def left_chat_member(_, message: Message):
     """When a restricted member left the chat, ban him for a while"""
     group_chat = message.chat

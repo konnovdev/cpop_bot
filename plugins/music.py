@@ -2,24 +2,6 @@
 to square thumbnail and upload to Telegram
 
 Send a link as a reply to bypass Music category check
-
-# requirements.txt
-Pillow
-youtube-dl
-
-# ../../config.py
-MUSIC_CHATS = [
-    -1234567891012,
-    -2345678910123
-]
-MUSIC_USERS = [1234567890]
-MUSIC_DELAY_DELETE_INFORM = 10
-MUSIC_INFORM_AVAILABILITY = (
-    "This bot only serves the specified group and"
-    "its members in private chat"
-)
-MUSIC_MAX_LENGTH = 10800
-
 """
 import os
 import asyncio
@@ -30,10 +12,15 @@ from pyrogram.types import Message
 from pyrogram.errors import UserNotParticipant
 from youtube_dl import YoutubeDL
 from PIL import Image
-from config import MUSIC_CHATS, MUSIC_USERS, MUSIC_DELAY_DELETE_INFORM
-from config import MUSIC_INFORM_AVAILABILITY, MUSIC_MAX_LENGTH
+from config import MUSIC_CHATS, MUSIC_USERS
 
+MUSIC_DELAY_DELETE_INFORM_IN_SECONDS = 10
 TG_THUMB_MAX_LENGTH = 320
+MUSIC_MAX_LENGTH_IN_SECONDS = 10800
+MUSIC_INFORM_AVAILABILITY = (
+    "This bot only serves the cpop.tw group and "
+    "its members in private chat"
+)
 SITES_REGEX = (
     r"^((?:https?:)?\/\/)"
     r"?((?:www|m)\.)"
@@ -46,16 +33,20 @@ EXCLUDE_PLAYLISTS = (
 
 
 @Client.on_message(filters.text
-                   & (filters.chat(MUSIC_CHATS) | filters.private)
                    & filters.incoming
                    & filters.regex(SITES_REGEX)
                    & ~filters.regex(EXCLUDE_PLAYLISTS)
                    & ~filters.edited)
-async def music_downloader(client, message: Message):
+async def music_downloader(client: Client, message: Message):
     """Add members of specified chats to the list when it's a private
-    chat
+    chat. Or if both music users and music chats are unspecified then just
+    allow the user to use the bot
     """
     # print(' '.join([str(u) for u in MUSIC_USERS]))
+    if message.chat.type != "private" and \
+            message.chat.id not in MUSIC_CHATS and \
+            len(MUSIC_CHATS) != 0:
+        return
     if message.chat.type == "private":
         user_id = message.from_user.id
         if user_id not in MUSIC_USERS:
@@ -66,6 +57,8 @@ async def music_downloader(client, message: Message):
                     break
                 except UserNotParticipant:
                     pass
+        if len(MUSIC_USERS) == 0 and len(MUSIC_CHATS) == 0:
+            MUSIC_USERS.append(user_id)
         if user_id not in MUSIC_USERS:
             await message.reply(MUSIC_INFORM_AVAILABILITY)
             return
@@ -88,15 +81,16 @@ async def _fetch_and_send_music(message: Message):
             inform = ("This won't be downloaded "
                       "because it's not under Music category")
             await _reply_and_delete_later(message, inform,
-                                          MUSIC_DELAY_DELETE_INFORM)
+                                          MUSIC_DELAY_DELETE_INFORM_IN_SECONDS)
             return
-        if info_dict['duration'] > MUSIC_MAX_LENGTH:
-            readable_max_length = str(timedelta(seconds=MUSIC_MAX_LENGTH))
+        if info_dict['duration'] > MUSIC_MAX_LENGTH_IN_SECONDS:
+            readable_max_length = \
+                str(timedelta(seconds=MUSIC_MAX_LENGTH_IN_SECONDS))
             inform = ("This won't be downloaded because its audio length is "
                       "longer than the limit `{}` which is set by the bot"
                       .format(readable_max_length))
             await _reply_and_delete_later(message, inform,
-                                          MUSIC_DELAY_DELETE_INFORM)
+                                          MUSIC_DELAY_DELETE_INFORM_IN_SECONDS)
             return
         d_status = await message.reply_text("Downloading...", quote=True,
                                             disable_notification=True)
@@ -139,8 +133,8 @@ async def _upload_audio(message: Message, info_dict, audio_file):
     if os.path.isfile(basename + ".jpg"):
         thumbnail_file = basename + ".jpg"
     else:
-        thumbnail_file = basename + "." + \
-            _get_file_extension_from_url(thumbnail_url)
+        file_extension = _get_file_extension_from_url(thumbnail_url)
+        thumbnail_file = basename + "." + file_extension
     squarethumb_file = basename + "_squarethumb.jpg"
     make_squarethumb(thumbnail_file, squarethumb_file)
     webpage_url = info_dict['webpage_url']
@@ -172,7 +166,7 @@ def make_squarethumb(thumbnail, output):
     squarethumb.save(output)
 
 
-def _crop_to_square(img):
+def _crop_to_square(img: Image):
     width, height = img.size
     length = min(width, height)
     left = (width - length) / 2

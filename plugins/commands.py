@@ -1,44 +1,31 @@
-"""commands which starts with slash /
+from pyrogram import Client, filters
+from pyrogram.types import Message
 
-# ../config
-COMMANDS_CHATS = MUSIC_CHATS
-COMMANDS_TEXT_START = (
-    "This is a music downloader bot for "
-    "members of the channel and group"
-)
-COMMANDS_TEXT_CONTACTS = (
-    "Regarding any issues with the bot "
-    "feel free to contact"
-)
 COMMANDS_TEXT_HELP = (
-    MUSIC_INFORM_AVAILABILITY
-    + "\n\n<b>Usage</b>:\n"
+    "This bot only serves cpop.tw and "
+    "its members in private chat"
+    "\n\n<b>Usage</b>:\n"
     "- Send a message that only contains a YouTube/SoundCloud/Mixcloud link "
     "to download the music\n"
     "- Playlists are not supported\n"
     "- Your message will be deleted in private chat after the music gets "
     "successfully uploaded\n"
     "- You can get YouTube links with inline bot @vid\n\n"
-    + COMMANDS_TEXT_CONTACTS
+    "Regarding any issues with the bot "
+    "feel free to contact @konnov"
 )
-
-"""
-from pyrogram import Client, filters
-from pyrogram.types import Message
-from config import COMMANDS_CHATS, COMMANDS_TEXT_START, COMMANDS_TEXT_HELP
 
 
 @Client.on_message(filters.command(["start"])
-                   & (filters.chat(COMMANDS_CHATS) | filters.private)
                    & filters.incoming
                    & ~filters.edited)
 async def command_start(_, message: Message):
     """/start introduction of the bot"""
-    await message.reply(COMMANDS_TEXT_START)
+    sticker = open('static/hello_animated_sticker.tgs', 'rb')
+    await message.reply_sticker(sticker)
 
 
 @Client.on_message(filters.command(["help"])
-                   & (filters.chat(COMMANDS_CHATS) | filters.private)
                    & filters.incoming
                    & ~filters.edited)
 async def command_help(_, message: Message):
@@ -47,7 +34,6 @@ async def command_help(_, message: Message):
 
 
 @Client.on_message(filters.command(["json"])
-                   & (filters.chat(COMMANDS_CHATS) | filters.private)
                    & filters.incoming
                    & ~filters.edited)
 async def command_json(_, message: Message):
@@ -56,7 +42,6 @@ async def command_json(_, message: Message):
 
 
 @Client.on_message(filters.command(["id"])
-                   & (filters.chat(COMMANDS_CHATS) | filters.private)
                    & filters.incoming
                    & ~filters.edited)
 async def command_id(_, message: Message):

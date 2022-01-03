@@ -1,5 +1,6 @@
-# import logging
+import logging
+
 from pyrogram import Client
 
-# logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=logging.DEBUG)
 Client("tgbot").run()
