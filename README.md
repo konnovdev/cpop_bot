@@ -16,11 +16,9 @@ A Telegram bot made with [Pyrogram Smart Plugins](https://docs.pyrogram.org/topi
    for building wheel for Pillow. with apt:
    `apt install -y python3-dev zlib1g-dev libjpeg-turbo8-dev libwebp-dev`
 3. `venv/bin/pip install -U -r requirements.txt` to install the requirements
-4. Create a new `config.ini` file, copy-paste the following and replace the
-   values with your own. Exclude or include plugins to fit your needs.
-   Create `config.py` and add constants that are specified in module docstrings
-   of enabled plugins.
-   ```
+4. Create a new `config.ini` file, copy-paste the following and replace with your own
+   values:
+```
    [pyrogram]
    api_id = 1234567
    api_hash = 0123456789abcdef0123456789abcdef
@@ -28,8 +26,8 @@ A Telegram bot made with [Pyrogram Smart Plugins](https://docs.pyrogram.org/topi
 
    [plugins]
    root = plugins
-   exclude = welcome
-   ```
+```
+   Create `config.py` and add constants that are specified in config_example.py
 5. Run with `venv/bin/python tgbot.py`
 6. Stop with <kbd>CTRL+C</kbd>
 
