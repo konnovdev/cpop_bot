@@ -21,8 +21,7 @@ COMMANDS_TEXT_HELP = (
                    & ~filters.edited)
 async def command_start(_, message: Message):
     """/start introduction of the bot"""
-    sticker = open('static/hello_animated_sticker.tgs', 'rb')
-    await message.reply_sticker(sticker)
+    await message.reply_sticker("static/hello_animated_sticker.tgs")
 
 
 @Client.on_message(filters.command(["help"])
