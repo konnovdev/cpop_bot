@@ -3,3 +3,4 @@ Pyrogram
 TgCrypto
 youtube-dl
 requests
+wolframalpha

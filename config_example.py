@@ -22,3 +22,8 @@ WELCOME_CAPTCHA_CHATS = ['1234567', '954534212']
 # Get API token from https://home.openweathermap.org/
 # to get the bot fetch the weather
 OPENWEATHER_API = "23141234awe124124"
+
+"""tools/wolfram.py"""
+# Get API token from https://developer.wolframalpha.com/
+# to get the bot to query wolframalpha.com
+WOLFRAMALPHA_API = "23141234awe124124"

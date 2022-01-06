@@ -1,18 +1,18 @@
 from pyrogram import Client, filters
 from pyrogram.types import Message
 
+from tools.utils import command_args_to_str
 from tools.weather import get_weather, InvalidApiKeyError
+from tools.wolfram import get_wolfram_result
 
 COMMANDS_TEXT_HELP = (
     "This bot only serves cpop.tw and "
     "its members in private chat"
     "\n\n<b>Usage</b>:\n"
-    "- Send a message that only contains a YouTube/SoundCloud/Mixcloud link "
-    "to download the music\n"
-    "- Playlists are not supported\n"
-    "- Your message will be deleted in private chat after the music gets "
-    "successfully uploaded\n"
-    "- You can get YouTube links with inline bot @vid\n\n"
+    "- To download a song send a message "
+    "that only contains a YouTube/SoundCloud/Mixcloud link\n"
+    "- /wf question - ask wolframalpha.com a question\n"
+    "- /weather city - get current weather for the city\n\n"
     "Regarding any issues with the bot "
     "feel free to contact @konnov"
 )
@@ -56,11 +56,7 @@ async def command_id(_, message: Message):
 async def command_weather(_, message: Message):
     """/weather city - get weather"""
     try:
-        start_city_name_index = 1
-        end_city_name_index = len(message.command)
-        city_name = "+".join(
-            message.command[start_city_name_index:end_city_name_index]
-        )
+        city_name = command_args_to_str(message.command)
         if city_name:
             weather_response = get_weather(city_name)
             await message.reply(weather_response)
@@ -68,4 +64,22 @@ async def command_weather(_, message: Message):
             await message.reply("Usage:\n/weather city"
                                 "\n\nFor example:\n/weather San Paulo")
     except InvalidApiKeyError:
+        pass
+
+
+@Client.on_message(filters.command(["wolfram", "wf"])
+                   & filters.incoming
+                   & ~filters.edited)
+async def command_wolfram(_, message: Message):
+    """/wf question - get answer from wolframalpha.com"""
+    try:
+        question = command_args_to_str(message.command)
+        if question:
+            wolfram_response = get_wolfram_result(question)
+            await message.reply(wolfram_response)
+        else:
+            await message.reply("Usage: \n/wolfram your query"
+                                "\n\nFor example:\n/wolfram capital of Japan"
+                                "\n\nYou can also use /wf instead of /wolfram")
+    except Exception:
         pass
