@@ -2,3 +2,4 @@ Pillow
 Pyrogram
 TgCrypto
 youtube-dl
+requests

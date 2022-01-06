@@ -17,3 +17,8 @@ WELCOME_CAPTCHA_CHATS = ['1234567', '954534212']
 # leave it as an empty array if you want this feature
 # to work everywhere where the bot is admin
 # WELCOME_CAPTCHA_CHATS = []
+
+"""tools/weather.py"""
+# Get API token from https://home.openweathermap.org/
+# to get the bot fetch the weather
+OPENWEATHER_API = "23141234awe124124"
