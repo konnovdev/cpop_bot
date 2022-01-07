@@ -2,7 +2,7 @@
 # Chats where the users can download music from video services
 # and additional users that need to use the music downloader
 # feature but are not in any chat
-MUSIC_CHATS = ['12345', '67890']
+MUSIC_CHATS = ["foo_group_username", -100123456789]
 # MUSIC_USERS should be list of str ("username") or int (ID)
 MUSIC_USERS = [53257673]
 # leave it as an empty array
