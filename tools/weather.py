@@ -1,5 +1,4 @@
 import requests
-import logging
 
 from config import OPENWEATHER_API
 
@@ -20,7 +19,6 @@ def get_weather(city_name: str):
 
     response = requests.get(complete_url)
     json_full_object = response.json()
-    logging.debug(str(json_full_object))
 
     response_code = str(json_full_object.get("cod"))
 
