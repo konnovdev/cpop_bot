@@ -11,8 +11,9 @@ COMMANDS_TEXT_HELP = (
     "\n\n<b>Usage</b>:\n"
     "- To download a song send a message "
     "that only contains a YouTube/SoundCloud/Mixcloud link\n"
-    "- /wf question - ask wolframalpha.com a question\n"
-    "- /weather city - get current weather for the city\n\n"
+    "- <code>/wf question</code> - ask wolframalpha.com a question\n"
+    "- <code>/weather city</code> - get current weather for the city\n"
+    "- <code>/dic word</code> - look up a word in cedict\n\n"
     "Regarding any issues with the bot "
     "feel free to contact @konnov"
 )
@@ -61,8 +62,9 @@ async def command_weather(_, message: Message):
             weather_response = get_weather(city_name)
             await message.reply(weather_response)
         else:
-            await message.reply("Usage:\n/weather city"
-                                "\n\nFor example:\n/weather San Paulo")
+            await message.reply("Usage:\n<code>/weather city</code>"
+                                "\n\nFor example:"
+                                "\n<code>/weather San Paulo</code>")
     except InvalidApiKeyError:
         pass
 
@@ -78,8 +80,10 @@ async def command_wolfram(_, message: Message):
             wolfram_response = get_wolfram_result(question)
             await message.reply(wolfram_response)
         else:
-            await message.reply("Usage: \n/wolfram your query"
-                                "\n\nFor example:\n/wolfram capital of Japan"
-                                "\n\nYou can also use /wf instead of /wolfram")
+            await message.reply("Usage: \n<code>/wolfram your query</code>"
+                                "\n\nFor example:"
+                                "\n<code>/wolfram capital of Japan</code>"
+                                "\n\nYou can also use <code>/wf</code> "
+                                "instead of <code>/wolfram</code>")
     except Exception:
         pass
