@@ -2,6 +2,12 @@
 
 A Telegram bot made with [Pyrogram Smart Plugins](https://docs.pyrogram.org/topics/smart-plugins)
 
+## Features
+- Get audio from a YouTube video - just send the video link, the bot will convert the music automatically.
+- Get current weather with **OpenWeatherApi** - use `/weather city`
+- Get a **wolframalpha** answer for the question - use `/wf your query`
+- Look up a word in **cedict** (Chinese/English dictionary) - use `/dic word`
+
 ## Requirements
 
 - Python 3.6 or higher
