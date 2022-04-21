@@ -6,3 +6,8 @@ services:
     volumes:
       - .:/usr/src/app
     restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "100m"
+        max-file: "5"
